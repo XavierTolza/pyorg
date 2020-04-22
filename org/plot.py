@@ -15,10 +15,10 @@ class Axis(object):
             return getattr(ax, item)
         return super(Axis, self).__getattribute__(item)
 
-    def set_info(self, title, xlabel, ylabel):
-        self.set_title(title)
-        self.set_xlabel(xlabel)
-        self.set_ylabel(ylabel)
+    def set_info(self, title=None, xlabel=None, ylabel=None):
+        for k, v in zip("title,xlabel,ylabel".split(","), [title, xlabel, ylabel]):
+            if v is not None:
+                getattr(self, f"set_{k}")(v)
 
 
 class Subplots(object):
