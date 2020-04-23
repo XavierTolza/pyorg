@@ -60,3 +60,4 @@ class Subplots(object):
 
         self.fig.savefig(self.filename)
         print(self.filename)
+        plt.close(self.fig)
