@@ -3,6 +3,7 @@ from os.path import dirname, abspath, isdir
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.legend import _get_legend_handles_labels
 
 
 class Axis(object):
@@ -22,7 +23,8 @@ class Axis(object):
 
 
 class Subplots(object):
-    def __init__(self, filename, *args, tight_layout=True, grid=None, **kwargs):
+    def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, **kwargs):
+        self.legend = legend
         self.filename = filename
         dir = dirname(abspath(filename))
         if not isdir(dir):
@@ -54,9 +56,11 @@ class Subplots(object):
             plt.tight_layout()
 
         grid = self.grid
-        if grid is not None and grid:
-            for ax in np.ravel([self.axes]):
+        for ax in np.ravel([self.axes]):
+            if grid is not None and grid:
                 ax.grid(**grid)
+            if self.legend:
+                ax.legend()
 
         self.fig.savefig(self.filename)
         print(self.filename)
