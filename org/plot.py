@@ -65,3 +65,11 @@ class Subplots(object):
         self.fig.savefig(self.filename)
         print(self.filename)
         plt.close(self.fig)
+
+
+def printcf(filename):
+    """
+    Saves current figure to a file and print it
+    """
+    plt.gcf().savefig(filename)
+    print(filename)
