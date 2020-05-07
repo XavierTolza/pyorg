@@ -4,6 +4,7 @@ from os.path import dirname, abspath, isdir
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.legend import _get_legend_handles_labels
+from matplotlib.transforms import Bbox
 
 
 class Axis(object):
@@ -20,6 +21,20 @@ class Axis(object):
         for k, v in zip("title,xlabel,ylabel".split(","), [title, xlabel, ylabel]):
             if v is not None:
                 getattr(self, f"set_{k}")(v)
+
+    def saveaxe(self, filename, pad=0):
+        ax = object.__getattribute__(self, "ax")
+        fig = ax.figure
+
+        ax.figure.canvas.draw()
+        items = ax.get_xticklabels() + ax.get_yticklabels()
+        items += [ax, ax.title]
+        bbox = Bbox.union([item.get_window_extent() for item in items])
+
+        extent = bbox.expanded(*(np.array([1, 1]) + pad))
+        extent = extent.transformed(fig.dpi_scale_trans.inverted())
+        # extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        fig.savefig(filename, bbox_inches=extent)
 
 
 class Subplots(object):
