@@ -61,9 +61,25 @@ except ImportError:
         ext_modules=extensions,
     ))
 
-with open("requirements.txt","r") as fp:
-    requirements = fp.read().split("\n")
 
+# Load requirements
+with open("requirements.txt", "r") as fp:
+    requirements = fp.read().splitlines()
+
+required = []
+EGG_MARK = '#egg='
+for line in requirements:
+    if line.startswith('-e git:') or line.startswith('-e git+') or \
+            line.startswith('git:') or line.startswith('git+'):
+        if EGG_MARK in line:
+            package_name = line[line.find(EGG_MARK) + len(EGG_MARK):]
+            required.append(f"{package_name} @ {line.split(EGG_MARK)[0]}")
+            # dependency_links.append(line)
+        else:
+            raise ValueError('Dependency to a git repository should have the format:\n'
+                             'git+ssh://git@github.com/xxxxx/xxxxxx#egg=package_name')
+    else:
+        required.append(line)
 
 setup(
     name=name,
@@ -72,7 +88,7 @@ setup(
     author='Xavier Tolza',
     author_email='tolza.xavier@gmail.com',
     packages=[base_folder],
-    install_requires=requirements,
+    install_requires=required,
     **kwargs
 )
 
