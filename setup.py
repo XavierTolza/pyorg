@@ -11,8 +11,8 @@ DEBUG = DEBUG is not None and DEBUG == "1"
 if DEBUG:
     print("Debug enabled")
 
-base_folder = "org"
-name = "pyorg"
+base_folder = "pyorg"
+name = base_folder
 
 kwargs = {}
 try:
@@ -60,7 +60,6 @@ except ImportError:
     kwargs.update(dict(
         ext_modules=extensions,
     ))
-
 
 # Load requirements
 with open("requirements.txt", "r") as fp:

@@ -1,3 +1,4 @@
+from numpy import *
 from pymath import *
 from pandas import concat
 from .tar import tar_read_file_member, Tar
