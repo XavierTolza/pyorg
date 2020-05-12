@@ -38,7 +38,8 @@ class Axis(object):
 
 
 class Subplots(object):
-    def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, **kwargs):
+    def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, export_svg=False, **kwargs):
+        self.export_svg = export_svg
         self.legend = legend
         self.filename = filename
         dir = dirname(abspath(filename))
@@ -78,6 +79,8 @@ class Subplots(object):
                 ax.legend()
 
         self.fig.savefig(self.filename)
+        if self.export_svg:
+            self.fig.savefig(".".join(self.filename.split(".")[:-1]) + ".svg")
         print(self.filename)
         plt.close("all")
 
