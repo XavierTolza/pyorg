@@ -1,10 +1,12 @@
-from os import makedirs
-from os.path import dirname, abspath, isdir
+from os import makedirs, mkdir
+from os.path import dirname, abspath, isdir, join
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.legend import _get_legend_handles_labels
 from matplotlib.transforms import Bbox
+
+from pyorg.config import plots_folder
 
 
 class Axis(object):
@@ -38,10 +40,12 @@ class Axis(object):
 
 
 class Subplots(object):
+    already_plotted = []
+
     def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, export_svg=False, **kwargs):
         self.export_svg = export_svg
         self.legend = legend
-        self.filename = filename
+        self.filename = join(plots_folder, filename)
         dir = dirname(abspath(filename))
         if not isdir(dir):
             makedirs(dir)
@@ -67,6 +71,10 @@ class Subplots(object):
         self.fig, self.axes = fig, axes
         return fig, axes
 
+    @property
+    def folder(self):
+        return dirname(self.filename)
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.tight_layout:
             plt.tight_layout()
@@ -78,10 +86,19 @@ class Subplots(object):
             if self.legend:
                 ax.legend()
 
-        self.fig.savefig(self.filename)
+        if not isdir(self.folder):
+            mkdir(self.folder)
+
+        filename = self.filename
+        if filename in self.already_plotted:
+            raise ValueError(f"You're trying to plot {filename} but a figure with this name has "
+                             f"already been plotted")
+        self.already_plotted.append(filename)
+
+        self.fig.savefig(filename)
         if self.export_svg:
-            self.fig.savefig(".".join(self.filename.split(".")[:-1]) + ".svg")
-        print(self.filename)
+            self.fig.savefig(".".join(filename.split(".")[:-1]) + ".svg")
+        print(filename)
         plt.close("all")
 
 
