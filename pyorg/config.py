@@ -6,6 +6,7 @@ plots_folder = "img"
 root_folder = "."
 disable_warning = True
 config_file_name = ".pyorg_config.json"
+enable_figure_filename_check = False
 
 # Search for a local config file
 if isfile(config_file_name):

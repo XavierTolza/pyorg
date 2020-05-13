@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib.legend import _get_legend_handles_labels
 from matplotlib.transforms import Bbox
 
-from pyorg.config import plots_folder
+from pyorg.config import plots_folder, enable_figure_filename_check
 
 
 class Axis(object):
@@ -90,10 +90,11 @@ class Subplots(object):
             mkdir(self.folder)
 
         filename = self.filename
-        if filename in self.already_plotted:
-            raise ValueError(f"You're trying to plot {filename} but a figure with this name has "
-                             f"already been plotted")
-        self.already_plotted.append(filename)
+        if enable_figure_filename_check:
+            if filename in self.already_plotted:
+                raise ValueError(f"You're trying to plot {filename} but a figure with this name has "
+                                 f"already been plotted")
+            self.already_plotted.append(filename)
 
         self.fig.savefig(filename)
         if self.export_svg:
