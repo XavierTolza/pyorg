@@ -75,32 +75,47 @@ class Subplots(object):
     def folder(self):
         return dirname(self.filename)
 
+    def handle_error(self, exc_type, exc_val, exc_tb):
+        import traceback
+        fig, ax = plt.subplots(1, 1)
+        text = traceback.format_exc()
+        ax.text(0, 0, text)
+        fig.savefig(self.filename)
+
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.tight_layout:
-            plt.tight_layout()
+        res = None
+        if exc_val is not None:
+            # An error occured, we will display inside the image
+            self.handle_error(exc_type, exc_val, exc_tb)
+            res = True
+        else:
 
-        grid = self.grid
-        for ax in np.ravel([self.axes]):
-            if grid is not None and grid:
-                ax.grid(**grid)
-            if self.legend:
-                ax.legend()
+            if self.tight_layout:
+                plt.tight_layout()
 
-        if not isdir(self.folder):
-            mkdir(self.folder)
+            grid = self.grid
+            for ax in np.ravel([self.axes]):
+                if grid is not None and grid:
+                    ax.grid(**grid)
+                if self.legend:
+                    ax.legend()
 
-        filename = self.filename
-        if enable_figure_filename_check:
-            if filename in self.already_plotted:
-                raise ValueError(f"You're trying to plot {filename} but a figure with this name has "
-                                 f"already been plotted")
-            self.already_plotted.append(filename)
+            if not isdir(self.folder):
+                mkdir(self.folder)
 
-        self.fig.savefig(filename)
-        if self.export_svg:
-            self.fig.savefig(".".join(filename.split(".")[:-1]) + ".svg")
-        print(filename)
+            filename = self.filename
+            if enable_figure_filename_check:
+                if filename in self.already_plotted:
+                    raise ValueError(f"You're trying to plot {filename} but a figure with this name has "
+                                     f"already been plotted")
+                self.already_plotted.append(filename)
+
+            self.fig.savefig(filename)
+            if self.export_svg:
+                self.fig.savefig(".".join(filename.split(".")[:-1]) + ".svg")
+        print(self.filename, end='')
         plt.close("all")
+        return res
 
 
 def printcf(filename):
