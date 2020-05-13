@@ -106,5 +106,6 @@ def printcf(filename):
     """
     Saves current figure to a file and print it
     """
+    filename = join(plots_folder, filename)
     plt.gcf().savefig(filename)
     print(filename)
