@@ -3,6 +3,7 @@ from os.path import dirname, abspath, isdir, join
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import cm
 from matplotlib.legend import _get_legend_handles_labels
 from matplotlib.transforms import Bbox
 
@@ -128,3 +129,9 @@ def printcf(filename):
     filename = join(plots_folder, filename)
     plt.gcf().savefig(filename)
     print(filename)
+
+
+def colormap(pos, colormap="Viridis"):
+    if type(pos) == int:
+        pos = np.linspace(0, 1, pos)
+    return cm.get_cmap(colormap)(pos)
