@@ -6,6 +6,7 @@ import numpy as np
 from matplotlib.legend import _get_legend_handles_labels
 from matplotlib.transforms import Bbox
 
+from pyorg import config
 from pyorg.config import plots_folder, enable_figure_filename_check
 
 
@@ -42,7 +43,9 @@ class Axis(object):
 class Subplots(object):
     already_plotted = []
 
-    def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, export_svg=False, **kwargs):
+    def __init__(self, filename, *args, tight_layout=True, grid=None, legend=False, export_svg=False,
+                 print_line_return=None, **kwargs):
+        self.print_line_return = print_line_return if print_line_return is not None else config.print_line_return
         self.export_svg = export_svg
         self.legend = legend
         self.filename = join(plots_folder, filename)
@@ -85,7 +88,7 @@ class Subplots(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         res = None
         if exc_val is not None:
-            # An error occured, we will display inside the image
+            # An error occured, we will display it inside the image
             self.handle_error(exc_type, exc_val, exc_tb)
             res = True
         else:
@@ -113,7 +116,7 @@ class Subplots(object):
             self.fig.savefig(filename)
             if self.export_svg:
                 self.fig.savefig(".".join(filename.split(".")[:-1]) + ".svg")
-        print(self.filename, end='')
+        print(self.filename, end="\n" if self.print_line_return else "")
         plt.close("all")
         return res
 
