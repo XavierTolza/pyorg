@@ -14,6 +14,7 @@ from pyorg.config import plots_folder, enable_figure_filename_check
 class Axis(object):
     def __init__(self, ax):
         self.ax = ax
+        self.__limits = None
 
     def __getattribute__(self, item):
         ax = object.__getattribute__(self, "ax")
@@ -25,6 +26,22 @@ class Axis(object):
         for k, v in zip("title,xlabel,ylabel".split(","), [title, xlabel, ylabel]):
             if v is not None:
                 getattr(self, f"set_{k}")(v)
+
+    def save_limits(self):
+        self.__limits = self.get_xlim(), self.get_ylim()
+
+    def pop_limits(self):
+        self.set_xlim(self.__limits[0])
+        self.set_ylim(self.__limits[1])
+
+    @property
+    def lims(self):
+        return np.concatenate([self.get_xlim(), self.get_ylim()])
+
+    @lims.setter
+    def lims(self, value):
+        self.set_xlim(tuple(value[:2]))
+        self.set_ylim(tuple(value[2:]))
 
     def saveaxe(self, filename, pad=0):
         ax = object.__getattribute__(self, "ax")
@@ -39,6 +56,11 @@ class Axis(object):
         extent = extent.transformed(fig.dpi_scale_trans.inverted())
         # extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
         fig.savefig(filename, bbox_inches=extent)
+
+    def draw_circle(self, x, y, r, **kwargs):
+        for _x, _y, _r in zip(*[np.ravel([i]) for i in [x, y, r]]):
+            a_circle = plt.Circle((_x, _y), _r, **kwargs)
+            self.add_artist(a_circle)
 
 
 class Subplots(object):
